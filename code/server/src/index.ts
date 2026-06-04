@@ -249,6 +249,39 @@ const run = async () => {
         res.json({ totalValue, expectedValue, byStage });
     });
 
+    // Monthly Forecast report endpoint
+    app.get("/monthly-forecast", async (req, res) => {
+        const opportunities = await AppDataSource.manager.getRepository(Opportunity).find();
+        const closeDatePastCount = opportunities.filter(opp => opp.closeDate && new Date(opp.closeDate) < new Date()).length;
+        const closeDateFutureCount = opportunities.filter(opp => opp.closeDate && new Date(opp.closeDate) >= new Date()).length;
+        const closeDatePastExpectedValue = opportunities
+            .filter(opp => opp.closeDate && new Date(opp.closeDate) < new Date())
+            .reduce((sum, opp) => sum + (opp.expectedValue || 0), 0);
+        const closeDateFutureExpectedValue = opportunities
+            .filter(opp => opp.closeDate && new Date(opp.closeDate) >= new Date())
+            .reduce((sum, opp) => sum + (opp.expectedValue || 0), 0);
+
+        const byMonth: { month: string; count: number; expectedValue: number }[] = [];
+        const now = new Date();
+        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        for (let i = 0; i < 6; i++) {
+            const d = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
+            const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            byMonth.push({ month, count: 0, expectedValue: 0 });
+        }
+        const monthIndex = new Map(byMonth.map((b, i) => [b.month, i]));
+        for (const opp of opportunities) {
+            if (!opp.closeDate) continue;
+            const month = opp.closeDate.slice(0, 7);
+            const i = monthIndex.get(month);
+            if (i === undefined) continue;
+            byMonth[i].count++;
+            byMonth[i].expectedValue += opp.expectedValue || 0;
+        }
+
+        res.json({ closeDatePastCount, closeDatePastExpectedValue, closeDateFutureCount, closeDateFutureExpectedValue, byMonth });
+    });
+
     app.listen(3000, () => {
         console.log("Server is running on http://localhost:3000");
     });

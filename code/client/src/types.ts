@@ -53,12 +53,13 @@ export interface PipelineReport {
 }
 
 export interface MonthlyForecastReport {
-    totalValue: number;
-    expectedValue: number;
-    byStage: {
-        stage: Stage;
+    closeDatePastCount: number;
+    closeDatePastExpectedValue: number;
+    closeDateFutureCount: number;
+    closeDateFutureExpectedValue: number;
+    byMonth: {
+        month: string;
         count: number;
-        totalValue: number;
         expectedValue: number;
     }[];
 }
