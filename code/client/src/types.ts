@@ -51,3 +51,14 @@ export interface PipelineReport {
         expectedValue: number;
     }[];
 }
+
+export interface MonthlyForecastReport {
+    totalValue: number;
+    expectedValue: number;
+    byStage: {
+        stage: Stage;
+        count: number;
+        totalValue: number;
+        expectedValue: number;
+    }[];
+}

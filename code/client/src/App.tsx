@@ -5,8 +5,9 @@ import { Pipeline } from "./pipeline";
 import { ManageFields } from "./manage-fields";
 import { ManageStages } from "./manage-stages";
 import { ManageSettings } from "./manage-settings";
+import { MonthlyForecast } from "./monthly-forecast";
 
-type Page = "home" | "pipeline" | "settings";
+type Page = "home" | "pipeline" | "monthly-forecast" | "settings";
 
 export const App: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -31,6 +32,9 @@ export const App: React.FC = () => {
                     <button onClick={() => setCurrentPage("pipeline")} className={`${navClass} ${currentPage === "pipeline" ? activeNavClass : inactiveNavClass}`}>
                         Pipeline
                     </button>
+                    <button onClick={() => setCurrentPage("monthly-forecast")} className={`${navClass} ${currentPage === "monthly-forecast" ? activeNavClass : inactiveNavClass}`}>
+                        Monthly Forecast
+                    </button>
                     <button onClick={() => setCurrentPage("settings")} className={`${navClass} ${currentPage === "settings" ? activeNavClass : inactiveNavClass}`}>
                         Settings
                     </button>
@@ -45,6 +49,8 @@ export const App: React.FC = () => {
             )}
 
             {currentPage === "pipeline" && <Pipeline />}
+
+            {currentPage === "monthly-forecast" && <MonthlyForecast />}
 
             {currentPage === "settings" && (
                 <>
