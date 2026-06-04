@@ -30,6 +30,7 @@ export interface Opportunity {
     stage: Stage;
     value: number;
     expectedValue?: number;
+    closeDate?: string;
     name?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     customFields?: Record<string, any>;

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Lead, CustomField, Opportunity } from "./types";
 import axios from "axios";
+import { OpportunityRow } from "./opportunity-row";
+import { AddOpportunity } from "./add-opportunity";
 
 export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -60,72 +62,65 @@ export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, 
         setLoading(false);
     };
 
-    const deleteOpportunity = async (oppId: number) => {
-        await axios.delete(`/api/opportunities/${oppId}`);
-        fetchOpportunities();
-    };
-
-    const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
-    if (isEditing) {
-        return (
-            <tr>
-                <td colSpan={6}>
-                    <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded bg-gray-100 w-96">
-                        <h2 className="text-xl font-fold">Edit</h2>
-                        {error && <p className="text-red-500">{error}</p>}
-                        {success && <p className="text-green-500">Lead updated successfully</p>}
+if (isEditing) {
+    return (
+        <tr>
+            <td colSpan={6}>
+                <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded bg-gray-100 w-96">
+                    <h2 className="text-xl font-fold">Edit Lead</h2>
+                    {error && <p className="text-red-500">{error}</p>}
+                    {success && <p className="text-green-500">Lead updated successfully</p>}
+                    <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        className="block w-full p-2 border border-gray-300 rounded"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        className="block w-full p-2 border border-gray-300 rounded"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Age"
+                        value={age}
+                        onChange={e => setAge(e.target.value)}
+                        className="block w-full p-2 border border-gray-300 rounded"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Phone Number"
+                        value={phoneNumber}
+                        onChange={e => setPhoneNumber(e.target.value)}
+                        className="block w-full p-2 border border-gray-300 rounded"
+                    />
+                    {customFields.map(field => (
                         <input
+                            key={field.id}
                             type="text"
-                            placeholder="First Name"
-                            value={firstName}
-                            onChange={e => setFirstName(e.target.value)}
+                            placeholder={field.label}
+                            value={customFieldValues[field.name] || ""}
+                            onChange={e =>
+                                setCustomFieldValues({
+                                    ...customFieldValues,
+                                    [field.name]: e.target.value,
+                                })
+                            }
                             className="block w-full p-2 border border-gray-300 rounded"
                         />
-                        <input
-                            type="text"
-                            placeholder="Last Name"
-                            value={lastName}
-                            onChange={e => setLastName(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Age"
-                            value={age}
-                            onChange={e => setAge(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Phone Number"
-                            value={phoneNumber}
-                            onChange={e => setPhoneNumber(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded"
-                        />
-                        {customFields.map(field => (
-                            <input
-                                key={field.id}
-                                type="text"
-                                placeholder={field.label}
-                                value={customFieldValues[field.name] || ""}
-                                onChange={e =>
-                                    setCustomFieldValues({
-                                        ...customFieldValues,
-                                        [field.name]: e.target.value,
-                                    })
-                                }
-                                className="block w-full p-2 border border-gray-300 rounded"
-                            />
-                        ))}
-                        <button type="submit" disabled={loading} className="block w-full p-2 bg-blue-500 text-white rounded">
-                            Update Lead
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        );
-    }
+                    ))}
+                    <button type="submit" disabled={loading} className="block w-full p-2 bg-blue-500 text-white rounded">
+                        Update Lead
+                    </button>
+                </form>
+            </td>
+        </tr>
+    );
+}
 
     return (
         <>
@@ -149,26 +144,14 @@ export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, 
                             {opportunities.length === 0 ? (
                                 <p className="text-gray-500">No opportunities</p>
                             ) : (
-                                <div className="space-y-2">
-                                    {opportunities.map(opp => (
-                                        <div key={opp.id} className="flex justify-between items-center p-2 bg-white border rounded">
-                                            <div>
-                                                <span className="font-medium">{opp.name || "Unnamed"}</span>
-                                                <span className="text-sm text-gray-600 ml-2">{opp.stage.name}</span>
-                                                <span className="text-sm text-gray-600 ml-2">{formatCurrency(opp.value)}</span>
-                                                <span className="text-sm text-gray-500 ml-2">
-                                                    Expected: {formatCurrency(opp.value * opp.stage.conversionLikelihood)}
-                                                </span>
-                                            </div>
-                                            <button
-                                                onClick={() => deleteOpportunity(opp.id)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="space-y-2">
+                                        {opportunities.map(opp => (
+                                            <OpportunityRow key={opp.id} opp={opp} onUpdate={() => { } } />
+                                        ))}
+                                    </div>
+                                    <AddOpportunity />
+                                </>
                             )}
                         </div>
                     </td>
