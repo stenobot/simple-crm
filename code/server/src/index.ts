@@ -251,7 +251,16 @@ const run = async () => {
 
     // Monthly Forecast report endpoint
     app.get("/monthly-forecast", async (req, res) => {
-        const opportunities = await AppDataSource.manager.getRepository(Opportunity).find();
+        const allOpportunities = await AppDataSource.manager.getRepository(Opportunity).find();
+
+        const customFieldName = typeof req.query.customField === "string" ? req.query.customField : "";
+        const opportunities = customFieldName
+            ? allOpportunities.filter(opp => {
+                  const v = opp.customFields?.[customFieldName];
+                  return v !== undefined && v !== null && v !== "";
+              })
+            : allOpportunities;
+
         const closeDatePastCount = opportunities.filter(opp => opp.closeDate && new Date(opp.closeDate) < new Date()).length;
         const closeDateFutureCount = opportunities.filter(opp => opp.closeDate && new Date(opp.closeDate) >= new Date()).length;
         const closeDatePastExpectedValue = opportunities
