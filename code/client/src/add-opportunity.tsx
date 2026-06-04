@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { CustomField } from "./types";
+import { CustomField, Stage } from "./types";
 
-export const AddOpportunity: React.FC<{ triggerRefresh?: number }> = ({ triggerRefresh = 0 }) => {
+interface AddOpportunityProps {
+    triggerRefresh?: number;
+    leadId?: number;
+    stages?: Stage[];
+    onOpportunityChanged?: () => void;
+}
+
+export const AddOpportunity: React.FC<AddOpportunityProps> = ({
+    triggerRefresh = 0,
+    leadId,
+    stages = [],
+    onOpportunityChanged,
+}) => {
     const [name, setName] = useState("");
-    const [stage, setStage] = useState("");
-    const [expectedValue, setExpectedValue] = useState("");
+    const [stageId, setStageId] = useState<string>("");
+    const [value, setValue] = useState("");
     const [closeDate, setCloseDate] = useState("");
     const [customFields, setCustomFields] = useState<CustomField[]>([]);
     const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
@@ -28,19 +40,21 @@ export const AddOpportunity: React.FC<{ triggerRefresh?: number }> = ({ triggerR
         setError("");
         try {
             await axios.post("/api/opportunities", {
+                leadId,
+                stageId: stageId ? parseInt(stageId) : undefined,
                 name,
-                stage,
-                expectedValue,
+                value: value ? parseFloat(value) : undefined,
                 closeDate,
                 customFields: customFieldValues,
             });
             setSuccess(true);
             setName("");
-            setStage("");
-            setExpectedValue("");
+            setStageId("");
+            setValue("");
             setCloseDate("");
             setCustomFieldValues({});
             setTimeout(() => setSuccess(false), 3000);
+            onOpportunityChanged?.();
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             setError((error as any).response.data);
@@ -60,18 +74,23 @@ export const AddOpportunity: React.FC<{ triggerRefresh?: number }> = ({ triggerR
                 onChange={e => setName(e.target.value)}
                 className="block w-full p-2 border border-gray-300 rounded"
             />
-            <input
-                type="text"
-                placeholder="Stage"
-                value={stage}
-                onChange={e => setStage(e.target.value)}
+            <select
+                value={stageId}
+                onChange={e => setStageId(e.target.value)}
                 className="block w-full p-2 border border-gray-300 rounded"
-            />
+            >
+                <option value="">Select a stage...</option>
+                {stages.map(stage => (
+                    <option key={stage.id} value={stage.id}>
+                        {stage.name}
+                    </option>
+                ))}
+            </select>
             <input
                 type="text"
-                placeholder="Expected Value"
-                value={expectedValue}
-                onChange={e => setExpectedValue(e.target.value)}
+                placeholder="Value"
+                value={value}
+                onChange={e => setValue(e.target.value)}
                 className="block w-full p-2 border border-gray-300 rounded"
             />
             <input

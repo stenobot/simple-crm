@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { CustomField, Opportunity } from "./types";
+import { CustomField, Opportunity, Stage } from "./types";
 import axios from "axios";
 
-export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }> = ({ opp, onUpdate }) => {
+interface OpportunityRowProps {
+    opp: Opportunity;
+    onUpdate: () => void;
+    stages?: Stage[];
+    fieldsRefresh?: number;
+}
+
+export const OpportunityRow: React.FC<OpportunityRowProps> = ({ opp, onUpdate, stages = [], fieldsRefresh = 0 }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [stage, setStage] = useState(opp.stage);
+    const [stageId, setStageId] = useState<string>(`${opp.stage.id}`);
     const [value, setValue] = useState(`${opp.value}`);
-    const [expectedValue, setExpectedValue] = useState(`${opp.expectedValue || ""}`);
     const [closeDate, setCloseDate] = useState(opp.closeDate ? opp.closeDate.split("T")[0] : "");
     const [name, setName] = useState(opp.name);
     const [customFields, setCustomFields] = useState<CustomField[]>([]);
@@ -19,7 +25,7 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
         if (isEditing) {
             fetchCustomFields();
         }
-    }, [isEditing]);
+    }, [isEditing, fieldsRefresh]);
 
     const fetchCustomFields = async () => {
         const result = await axios.get("/api/custom-fields");
@@ -33,9 +39,8 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
         try {
             await axios.put(`/api/opportunities/${opp.id}`, {
                 name,
-                stage,
-                value,
-                expectedValue,
+                stageId: stageId ? parseInt(stageId) : undefined,
+                value: value ? parseFloat(value) : undefined,
                 closeDate,
                 customFields: customFieldValues,
             });
@@ -49,19 +54,15 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
         setLoading(false);
     };
 
-    const deleteOpportunity = async (oppId: number) => {
-        await axios.delete(`/api/opportunities/${oppId}`);
-        //onUpdate();
-    };
-
-    const editOpportunity = async (oppId: number) => {
-        // Implement edit functionality as needed
+    const deleteOpportunity = async () => {
+        await axios.delete(`/api/opportunities/${opp.id}`);
+        onUpdate();
     };
 
     const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
     if (isEditing) {
-        return (        
+        return (
             <div>
                 <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded bg-gray-100 w-96">
                     <h2 className="text-xl font-fold">Edit Opportunity</h2>
@@ -74,25 +75,23 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
                         onChange={e => setName(e.target.value)}
                         className="block w-full p-2 border border-gray-300 rounded"
                     />
-                    <input
-                        type="text"
-                        placeholder="Stage"
-                        value={stage.name}
-                        onChange={e => setStage({ ...stage, name: e.target.value })}
+                    <select
+                        value={stageId}
+                        onChange={e => setStageId(e.target.value)}
                         className="block w-full p-2 border border-gray-300 rounded"
-                    />
+                    >
+                        <option value="">Select a stage...</option>
+                        {stages.map(stage => (
+                            <option key={stage.id} value={stage.id}>
+                                {stage.name}
+                            </option>
+                        ))}
+                    </select>
                     <input
                         type="text"
                         placeholder="Value"
                         value={value}
                         onChange={e => setValue(e.target.value)}
-                        className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Expected Value"
-                        value={expectedValue}
-                        onChange={e => setExpectedValue(e.target.value)}
                         className="block w-full p-2 border border-gray-300 rounded"
                     />
                     <input
@@ -122,7 +121,6 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
                     </button>
                 </form>
             </div>
-        
         );
     }
 
@@ -144,13 +142,13 @@ export const OpportunityRow: React.FC<{ opp: Opportunity; onUpdate: () => void }
                 </div>
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => editOpportunity(opp.id)}
+                        onClick={() => setIsEditing(true)}
                         className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
                     >
                         Edit
                     </button>
                     <button
-                        onClick={() => deleteOpportunity(opp.id)}
+                        onClick={deleteOpportunity}
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
                     >
                         Delete

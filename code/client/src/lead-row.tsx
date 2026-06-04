@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
-import { Lead, CustomField, Opportunity } from "./types";
+import { Lead, CustomField, Opportunity, Stage } from "./types";
 import axios from "axios";
 import { OpportunityRow } from "./opportunity-row";
 import { AddOpportunity } from "./add-opportunity";
 
-export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, onUpdate }) => {
+interface LeadRowProps {
+    lead: Lead;
+    onUpdate: () => void;
+    fieldsRefresh?: number;
+}
+
+export const LeadRow: React.FC<LeadRowProps> = ({ lead, onUpdate, fieldsRefresh = 0 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [showOpps, setShowOpps] = useState(false);
     const [firstName, setFirstName] = useState(lead.firstName);
@@ -14,21 +20,28 @@ export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, 
     const [customFields, setCustomFields] = useState<CustomField[]>([]);
     const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>(lead.customFields || {});
     const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [stages, setStages] = useState<Stage[]>([]);
+    const [oppsRefresh, setOppsRefresh] = useState(0);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const handleOppsChanged = () => {
+        setOppsRefresh(prev => prev + 1);
+    };
 
     useEffect(() => {
         if (isEditing) {
             fetchCustomFields();
         }
-    }, [isEditing]);
+    }, [isEditing, fieldsRefresh]);
 
     useEffect(() => {
         if (showOpps) {
             fetchOpportunities();
+            fetchStages();
         }
-    }, [showOpps]);
+    }, [showOpps, oppsRefresh]);
 
     const fetchCustomFields = async () => {
         const result = await axios.get("/api/custom-fields");
@@ -38,6 +51,11 @@ export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, 
     const fetchOpportunities = async () => {
         const result = await axios.get("/api/opportunities");
         setOpportunities(result.data.filter((opp: Opportunity) => opp.lead.id === lead.id));
+    };
+
+    const fetchStages = async () => {
+        const result = await axios.get("/api/stages");
+        setStages(result.data);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,65 +80,65 @@ export const LeadRow: React.FC<{ lead: Lead; onUpdate: () => void }> = ({ lead, 
         setLoading(false);
     };
 
-if (isEditing) {
-    return (
-        <tr>
-            <td colSpan={6}>
-                <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded bg-gray-100 w-96">
-                    <h2 className="text-xl font-fold">Edit Lead</h2>
-                    {error && <p className="text-red-500">{error}</p>}
-                    {success && <p className="text-green-500">Lead updated successfully</p>}
-                    <input
-                        type="text"
-                        placeholder="First Name"
-                        value={firstName}
-                        onChange={e => setFirstName(e.target.value)}
-                        className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Last Name"
-                        value={lastName}
-                        onChange={e => setLastName(e.target.value)}
-                        className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Age"
-                        value={age}
-                        onChange={e => setAge(e.target.value)}
-                        className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Phone Number"
-                        value={phoneNumber}
-                        onChange={e => setPhoneNumber(e.target.value)}
-                        className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    {customFields.map(field => (
+    if (isEditing) {
+        return (
+            <tr>
+                <td colSpan={6}>
+                    <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded bg-gray-100 w-96">
+                        <h2 className="text-xl font-fold">Edit Lead</h2>
+                        {error && <p className="text-red-500">{error}</p>}
+                        {success && <p className="text-green-500">Lead updated successfully</p>}
                         <input
-                            key={field.id}
                             type="text"
-                            placeholder={field.label}
-                            value={customFieldValues[field.name] || ""}
-                            onChange={e =>
-                                setCustomFieldValues({
-                                    ...customFieldValues,
-                                    [field.name]: e.target.value,
-                                })
-                            }
+                            placeholder="First Name"
+                            value={firstName}
+                            onChange={e => setFirstName(e.target.value)}
                             className="block w-full p-2 border border-gray-300 rounded"
                         />
-                    ))}
-                    <button type="submit" disabled={loading} className="block w-full p-2 bg-blue-500 text-white rounded">
-                        Update Lead
-                    </button>
-                </form>
-            </td>
-        </tr>
-    );
-}
+                        <input
+                            type="text"
+                            placeholder="Last Name"
+                            value={lastName}
+                            onChange={e => setLastName(e.target.value)}
+                            className="block w-full p-2 border border-gray-300 rounded"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Age"
+                            value={age}
+                            onChange={e => setAge(e.target.value)}
+                            className="block w-full p-2 border border-gray-300 rounded"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Phone Number"
+                            value={phoneNumber}
+                            onChange={e => setPhoneNumber(e.target.value)}
+                            className="block w-full p-2 border border-gray-300 rounded"
+                        />
+                        {customFields.map(field => (
+                            <input
+                                key={field.id}
+                                type="text"
+                                placeholder={field.label}
+                                value={customFieldValues[field.name] || ""}
+                                onChange={e =>
+                                    setCustomFieldValues({
+                                        ...customFieldValues,
+                                        [field.name]: e.target.value,
+                                    })
+                                }
+                                className="block w-full p-2 border border-gray-300 rounded"
+                            />
+                        ))}
+                        <button type="submit" disabled={loading} className="block w-full p-2 bg-blue-500 text-white rounded">
+                            Update Lead
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        );
+    }
 
     return (
         <>
@@ -144,15 +162,24 @@ if (isEditing) {
                             {opportunities.length === 0 ? (
                                 <p className="text-gray-500">No opportunities</p>
                             ) : (
-                                <>
-                                    <div className="space-y-2">
-                                        {opportunities.map(opp => (
-                                            <OpportunityRow key={opp.id} opp={opp} onUpdate={() => { } } />
-                                        ))}
-                                    </div>
-                                    <AddOpportunity />
-                                </>
+                                <div className="space-y-2">
+                                    {opportunities.map(opp => (
+                                        <OpportunityRow
+                                            key={opp.id}
+                                            opp={opp}
+                                            onUpdate={handleOppsChanged}
+                                            stages={stages}
+                                            fieldsRefresh={fieldsRefresh}
+                                        />
+                                    ))}
+                                </div>
                             )}
+                            <AddOpportunity
+                                leadId={lead.id}
+                                stages={stages}
+                                triggerRefresh={fieldsRefresh}
+                                onOpportunityChanged={handleOppsChanged}
+                            />
                         </div>
                     </td>
                 </tr>

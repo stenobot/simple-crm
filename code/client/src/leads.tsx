@@ -30,7 +30,7 @@ export const Leads: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 
                 </thead>
                 <tbody>
                     {leads.map(lead => (
-                        <LeadRow lead={lead} key={lead.id} onUpdate={fetchLeads} />
+                        <LeadRow lead={lead} key={lead.id} onUpdate={fetchLeads} fieldsRefresh={refreshTrigger} />
                     ))}
                 </tbody>
             </table>
