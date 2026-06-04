@@ -162,6 +162,7 @@ const run = async () => {
         opp.value = req.body.value;
         opp.name = req.body.name;
         opp.customFields = req.body.customFields || {};
+        opp.closeDate = req.body.closeDate || null;
         const likelihood =
             opp.stage.status === "won" ? wonLikelihood : opp.stage.status === "lost" ? lostLikelihood : opp.stage.conversionLikelihood;
         opp.expectedValue = opp.value * likelihood;
@@ -192,6 +193,7 @@ const run = async () => {
         }
         if (req.body.name !== undefined) opp.name = req.body.name;
         if (req.body.customFields) opp.customFields = req.body.customFields;
+        if (req.body.closeDate !== undefined) opp.closeDate = req.body.closeDate || null;
         const likelihood =
             opp.stage.status === "won" ? wonLikelihood : opp.stage.status === "lost" ? lostLikelihood : opp.stage.conversionLikelihood;
         opp.expectedValue = opp.value * likelihood;
