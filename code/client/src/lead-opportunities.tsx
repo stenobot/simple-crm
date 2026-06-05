@@ -9,7 +9,7 @@ import { Lead, Opportunity } from "./types";
 import { formatCurrency } from "./format";
 import { Drawer } from "./drawer";
 import { OpportunityForm } from "./opportunity-form";
-import { IconButton, PencilIcon, TrashIcon } from "./icons";
+import { IconButton, PencilIcon, PlusIcon, TrashIcon } from "./icons";
 
 export const LeadOpportunities: React.FC<{
     lead: Lead;
@@ -49,7 +49,8 @@ export const LeadOpportunities: React.FC<{
                 <h3 className="font-bold">Opportunities</h3>
                 <button
                     onClick={openAdd}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm inline-flex items-center gap-1">
+                    <PlusIcon />
                     Add Opportunity
                 </button>
             </div>

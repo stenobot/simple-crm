@@ -5,6 +5,7 @@ import { LeadRow } from "./lead-row";
 import { Drawer } from "./drawer";
 import { LeadForm } from "./lead-form";
 import { queryKeys, fetchLeads } from "./api";
+import { PlusIcon } from "./icons";
 
 export const Leads: React.FC = () => {
     const { data: leads = [] } = useQuery({
@@ -31,7 +32,8 @@ export const Leads: React.FC = () => {
                 <h2 className="text-xl font-bold">Leads</h2>
                 <button
                     onClick={openAdd}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm inline-flex items-center gap-1">
+                    <PlusIcon />
                     Add Lead
                 </button>
             </div>
