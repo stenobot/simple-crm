@@ -1,5 +1,5 @@
-import { Stage } from "../entity/Stage";
-import { Settings } from "./settings";
+import type { Stage } from "../entity/Stage";
+import type { Settings } from "./settings";
 
 export function likelihoodFor(stage: Stage, settings: Settings): number {
     if (stage.status === "won") return settings.wonStageLikelihood;

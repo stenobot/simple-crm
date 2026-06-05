@@ -10,25 +10,7 @@ import {
     OpportunityInput,
 } from "./api";
 import { Opportunity } from "./types";
-
-// Keep only digits and at most one decimal point (with up to 2 decimals).
-const normalizeMoneyInput = (raw: string): string => {
-    const stripped = raw.replace(/[^0-9.]/g, "");
-    const parts = stripped.split(".");
-    if (parts.length === 1) return parts[0];
-    return parts[0] + "." + parts.slice(1).join("").slice(0, 2);
-};
-
-// Display a raw numeric string as "$1,234" or "$1,234.5" preserving the
-// user's partial input (so they can type "1234." and see "$1,234.").
-const formatMoneyForInput = (raw: string): string => {
-    if (!raw) return "";
-    const [intPart, decPart] = raw.split(".");
-    const intFormatted = (intPart === "" ? 0 : parseInt(intPart, 10)).toLocaleString(
-        "en-US",
-    );
-    return decPart === undefined ? `$${intFormatted}` : `$${intFormatted}.${decPart}`;
-};
+import { normalizeMoneyInput, formatMoneyForInput } from "./format";
 
 const formatMinHint = (n: number): string => `$${n.toLocaleString("en-US")}`;
 
