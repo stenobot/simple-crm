@@ -5,7 +5,7 @@
 A tiny CRM (leads, opportunities, pipeline stages, custom fields) built as an npm
 workspaces monorepo. React + Vite client and Express + TypeORM + SQLite server.
 
-# Special instructions for Copilot
+## Special instructions for Copilot
 
 This is a fake codebase that I'm working on as a coding exercise. So, it doesn't need 
 to be production ready, but the code changes need to be clean and consistent. 
@@ -16,6 +16,13 @@ implications, etc) pause and explicitly write down: (a) what's the smallest poss
 solution? (b) what approach would a senior engineer with deep familiarity with this 
 codebase take? If the answers are not obvious, search first, then run your preferred 
 approach by me.
+
+## Taxonomy
+- **Lead**: A potential customer tracked by sales reps. Includes customer's personal info and opportunities.
+- **Opportunity**: A deal that sales reps are working on for a lead. A lead can have none or many opportunities.
+- **Pipeline Report**: A report showing opportunities by stage.
+- **Custom Field**: Can apply to either a lead or an opportunity. Both leads and opportunities can each have multiple custom fields.
+- **Stage**: Which stage of the sale's pipeline an opportunity is currently in. Each opportunity can only be in one stage at a time. 	
 
 ## Layout
 
