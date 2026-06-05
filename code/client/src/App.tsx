@@ -3,30 +3,42 @@ import { Leads } from "./leads";
 import { Pipeline } from "./pipeline";
 import { Forecast } from "./forecast";
 import { Settings } from "./settings";
+import { GearIcon } from "./icons";
 
-const navClass = "px-4 py-2 rounded font-medium transition";
-const activeNavClass = "bg-blue-500 text-white";
-const inactiveNavClass = "bg-gray-200 text-gray-700 hover:bg-gray-300";
+const textNavClass = ({ isActive }: { isActive: boolean }) =>
+    `px-2 py-2 text-sm font-medium transition ${
+        isActive
+            ? "text-gray-900 underline underline-offset-4"
+            : "text-gray-600 hover:text-gray-900"
+    }`;
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `${navClass} ${isActive ? activeNavClass : inactiveNavClass}`;
+const iconNavClass = ({ isActive }: { isActive: boolean }) =>
+    `p-2 rounded transition ${
+        isActive
+            ? "text-gray-900 bg-gray-100"
+            : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+    }`;
 
 export const App: React.FC = () => (
     <div className="p-4 space-y-8">
         <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold">SimpleCRM</h1>
-            <nav className="flex gap-2">
-                <NavLink to="/" end className={navLinkClass}>
+            <nav className="flex gap-2 items-center">
+                <NavLink to="/" end className={textNavClass}>
                     Home
                 </NavLink>
-                <NavLink to="/pipeline" className={navLinkClass}>
+                <NavLink to="/pipeline" className={textNavClass}>
                     Pipeline
                 </NavLink>
-                <NavLink to="/forecast" className={navLinkClass}>
+                <NavLink to="/forecast" className={textNavClass}>
                     Forecast
                 </NavLink>
-                <NavLink to="/settings" className={navLinkClass}>
-                    Settings
+                <NavLink
+                    to="/settings"
+                    className={iconNavClass}
+                    title="Settings"
+                    aria-label="Settings">
+                    <GearIcon className="w-5 h-5" />
                 </NavLink>
             </nav>
         </div>
