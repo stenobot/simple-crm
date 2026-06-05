@@ -45,6 +45,26 @@ export const deleteLead = async (id: number): Promise<void> => {
 export const fetchOpportunities = async (): Promise<Opportunity[]> =>
     (await axios.get("/api/opportunities")).data;
 
+export type OpportunityInput = {
+    leadId: number;
+    stageId: number;
+    value: number;
+    name?: string;
+    closeDate?: string | null;
+    customFields: Record<string, string>;
+};
+
+export const createOpportunity = async (
+    input: OpportunityInput,
+): Promise<Opportunity> =>
+    (await axios.post("/api/opportunities", input)).data;
+
+export const updateOpportunity = async (
+    id: number,
+    input: Partial<OpportunityInput>,
+): Promise<Opportunity> =>
+    (await axios.put(`/api/opportunities/${id}`, input)).data;
+
 export const deleteOpportunity = async (id: number): Promise<void> => {
     await axios.delete(`/api/opportunities/${id}`);
 };

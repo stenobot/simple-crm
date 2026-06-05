@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     queryKeys,
@@ -6,6 +7,8 @@ import {
 } from "./api";
 import { Lead, Opportunity } from "./types";
 import { formatCurrency } from "./format";
+import { Drawer } from "./drawer";
+import { OpportunityForm } from "./opportunity-form";
 
 export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
     const queryClient = useQueryClient();
@@ -22,13 +25,31 @@ export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.opportunities });
             queryClient.invalidateQueries({ queryKey: queryKeys.pipeline });
-            queryClient.invalidateQueries({ queryKey: queryKeys.stages });
         },
     });
 
+    const [drawerOpp, setDrawerOpp] = useState<Opportunity | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const openAdd = () => {
+        setDrawerOpp(null);
+        setDrawerOpen(true);
+    };
+    const openEdit = (opp: Opportunity) => {
+        setDrawerOpp(opp);
+        setDrawerOpen(true);
+    };
+    const close = () => setDrawerOpen(false);
+
     return (
         <div className="space-y-4">
-            <h3 className="font-bold">Opportunities</h3>
+            <div className="flex items-center justify-between">
+                <h3 className="font-bold">Opportunities</h3>
+                <button
+                    onClick={openAdd}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                    Add Opportunity
+                </button>
+            </div>
             {opportunities.length === 0 ? (
                 <p className="text-gray-500">No opportunities</p>
             ) : (
@@ -53,16 +74,39 @@ export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
                                         opp.value * opp.stage.conversionLikelihood,
                                     )}
                                 </span>
+                                {opp.closeDate && (
+                                    <span className="text-sm text-gray-500 ml-2">
+                                        Close: {opp.closeDate}
+                                    </span>
+                                )}
                             </div>
-                            <button
-                                onClick={() => deleteMutation.mutate(opp.id)}
-                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
-                                Delete
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openEdit(opp)}
+                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => deleteMutation.mutate(opp.id)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
             )}
+            <Drawer
+                open={drawerOpen}
+                onClose={close}
+                title={drawerOpp ? "Edit Opportunity" : "Add Opportunity"}>
+                <OpportunityForm
+                    key={drawerOpp?.id ?? "new"}
+                    opportunity={drawerOpp ?? undefined}
+                    leadId={lead.id}
+                    onSuccess={close}
+                />
+            </Drawer>
         </div>
     );
 };
