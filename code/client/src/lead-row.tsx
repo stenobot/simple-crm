@@ -6,28 +6,41 @@ export const LeadRow: React.FC<{
     lead: Lead;
     onEdit: (lead: Lead) => void;
 }> = ({ lead, onEdit }) => {
-    const [showOpps, setShowOpps] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     return (
         <>
-            <tr>
-                <td>
-                    <button onClick={() => onEdit(lead)} className="mr-2">
-                        Edit
-                    </button>
-                    <button onClick={() => setShowOpps(!showOpps)}>
-                        {showOpps ? "Hide" : "Show"} Opps
-                    </button>
+            <tr
+                onClick={() => setExpanded(!expanded)}
+                className="cursor-pointer hover:bg-gray-50 select-none focus:outline-none"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+                aria-expanded={expanded}>
+                <td className="w-6 pr-2 text-center bg-white">
+                    <span
+                        className={`inline-block transition-transform ${expanded ? "rotate-90" : ""}`}
+                        style={{
+                            width: 0,
+                            height: 0,
+                            borderTop: "5px solid transparent",
+                            borderBottom: "5px solid transparent",
+                            borderLeft: "6px solid currentColor",
+                        }}
+                        aria-hidden="true"
+                    />
                 </td>
-                <td>{lead.firstName}</td>
-                <td>{lead.lastName}</td>
-                <td>{lead.age}</td>
-                <td>{lead.phoneNumber}</td>
+                <td className="border border-gray-300 p-2">{lead.firstName}</td>
+                <td className="border border-gray-300 p-2">{lead.lastName}</td>
+                <td className="border border-gray-300 p-2 text-right font-mono">{lead.age}</td>
+                <td className="border border-gray-300 p-2">{lead.phoneNumber}</td>
             </tr>
-            {showOpps && (
+            {expanded && (
                 <tr>
-                    <td colSpan={5} className="p-4 bg-gray-50">
-                        <LeadOpportunities lead={lead} />
+                    <td className="bg-white"></td>
+                    <td colSpan={4} className="border border-gray-300 p-4 bg-gray-50">
+                        <LeadOpportunities
+                            lead={lead}
+                            onEditLead={() => onEdit(lead)}
+                        />
                     </td>
                 </tr>
             )}

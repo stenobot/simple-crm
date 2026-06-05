@@ -27,7 +27,7 @@ export const Leads: React.FC = () => {
 
     return (
         <div className="w-full">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 pl-6">
                 <h2 className="text-xl font-bold">Leads</h2>
                 <button
                     onClick={openAdd}
@@ -35,14 +35,14 @@ export const Leads: React.FC = () => {
                     Add Lead
                 </button>
             </div>
-            <table className="table-auto w-full">
+            <table className="table-auto w-full border-collapse">
                 <thead>
                     <tr>
-                        <th></th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Age</th>
-                        <th>Phone Number</th>
+                        <th className="w-6"></th>
+                        <th className="border border-gray-300 bg-gray-100 p-2 text-left">First Name</th>
+                        <th className="border border-gray-300 bg-gray-100 p-2 text-left">Last Name</th>
+                        <th className="border border-gray-300 bg-gray-100 p-2 text-right">Age</th>
+                        <th className="border border-gray-300 bg-gray-100 p-2 text-left">Phone Number</th>
                     </tr>
                 </thead>
                 <tbody>

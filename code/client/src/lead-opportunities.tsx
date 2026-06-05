@@ -10,7 +10,10 @@ import { formatCurrency } from "./format";
 import { Drawer } from "./drawer";
 import { OpportunityForm } from "./opportunity-form";
 
-export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
+export const LeadOpportunities: React.FC<{
+    lead: Lead;
+    onEditLead?: () => void;
+}> = ({ lead, onEditLead }) => {
     const queryClient = useQueryClient();
     const { data: allOpps = [] } = useQuery({
         queryKey: queryKeys.opportunities,
@@ -44,11 +47,20 @@ export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="font-bold">Opportunities</h3>
-                <button
-                    onClick={openAdd}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
-                    Add Opportunity
-                </button>
+                <div className="flex gap-2">
+                    {onEditLead && (
+                        <button
+                            onClick={onEditLead}
+                            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm">
+                            Edit Lead
+                        </button>
+                    )}
+                    <button
+                        onClick={openAdd}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                        Add Opportunity
+                    </button>
+                </div>
             </div>
             {opportunities.length === 0 ? (
                 <p className="text-gray-500">No opportunities</p>
