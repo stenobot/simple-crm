@@ -6,10 +6,10 @@ import { Settings } from "./settings";
 import { GearIcon } from "./icons";
 
 const textNavClass = ({ isActive }: { isActive: boolean }) =>
-    `px-2 py-2 text-sm font-medium transition ${
+    `px-2 py-2 text-base transition ${
         isActive
-            ? "text-gray-900 underline underline-offset-4"
-            : "text-gray-600 hover:text-gray-900"
+            ? "text-gray-900 font-bold underline underline-offset-4"
+            : "text-gray-600 font-medium hover:text-gray-900"
     }`;
 
 const iconNavClass = ({ isActive }: { isActive: boolean }) =>
