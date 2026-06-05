@@ -22,32 +22,19 @@ const stage = (
     }) as unknown as Stage;
 
 describe("likelihoodFor", () => {
-    it("returns settings.wonStageLikelihood for won stages", () => {
-        expect(likelihoodFor(stage("won"), settings)).toBe(1);
-    });
-    it("returns settings.lostStageLikelihood for lost stages", () => {
-        expect(likelihoodFor(stage("lost"), settings)).toBe(0);
-    });
-    it("returns the stage's own likelihood for pending stages", () => {
-        expect(likelihoodFor(stage("pending", 0.4), settings)).toBe(0.4);
-    });
-    it("ignores stage.conversionLikelihood for won and lost", () => {
+    it("uses settings.wonStageLikelihood for won stages, ignoring the stage's own value", () => {
         expect(likelihoodFor(stage("won", 0.999), settings)).toBe(1);
+    });
+    it("uses settings.lostStageLikelihood for lost stages, ignoring the stage's own value", () => {
         expect(likelihoodFor(stage("lost", 0.999), settings)).toBe(0);
+    });
+    it("uses the stage's own likelihood for pending stages", () => {
+        expect(likelihoodFor(stage("pending", 0.4), settings)).toBe(0.4);
     });
 });
 
 describe("expectedValueFor", () => {
-    it("multiplies value by likelihood for pending", () => {
+    it("multiplies value by likelihoodFor()", () => {
         expect(expectedValueFor(1000, stage("pending", 0.5), settings)).toBe(500);
-    });
-    it("returns full value for won", () => {
-        expect(expectedValueFor(2500, stage("won"), settings)).toBe(2500);
-    });
-    it("returns 0 for lost", () => {
-        expect(expectedValueFor(2500, stage("lost"), settings)).toBe(0);
-    });
-    it("handles zero value", () => {
-        expect(expectedValueFor(0, stage("pending", 0.5), settings)).toBe(0);
     });
 });

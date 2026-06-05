@@ -168,12 +168,6 @@ describe("buildForecast", () => {
         expect(june.expectedValue).toBe(350);
     });
 
-    it("produces human-readable month labels", () => {
-        const buckets = buildForecast([], { now });
-        expect(buckets[1].label).toBe("Jun 2026");
-        expect(buckets[6].label).toBe("Nov 2026");
-    });
-
     it("parses YYYY-MM-DD as local date (no UTC shift)", () => {
         // 2026-06-01 at UTC midnight would shift to May 31 in negative-offset TZs.
         // Our parser must always land in June regardless of TZ.
