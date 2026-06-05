@@ -5,11 +5,7 @@ import {
     deleteOpportunity as deleteOpportunityApi,
 } from "./api";
 import { Lead, Opportunity } from "./types";
-
-const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-        value,
-    );
+import { formatCurrency } from "./format";
 
 export const LeadOpportunities: React.FC<{ lead: Lead }> = ({ lead }) => {
     const queryClient = useQueryClient();

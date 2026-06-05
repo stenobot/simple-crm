@@ -104,12 +104,6 @@ export async function seedDatabase({ clearFirst = false }: { clearFirst?: boolea
 
     console.log(`✓ Created ${oppCount} opportunities`);
 
-    for (const stage of stages) {
-        const stageOpps = await connection.manager.getRepository(Opportunity).find({ where: { stage: { id: stage.id } } });
-        stage.expectedValue = stageOpps.reduce((sum, opp) => sum + (opp.expectedValue || 0), 0);
-        await connection.manager.getRepository(Stage).save(stage);
-    }
-
     console.log("✓ Seeding complete!");
 }
 

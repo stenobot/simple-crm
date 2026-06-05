@@ -21,7 +21,6 @@ export interface Stage {
     status: "pending" | "won" | "lost";
     conversionLikelihood: number;
     order: number;
-    expectedValue?: number;
 }
 
 export interface Opportunity {

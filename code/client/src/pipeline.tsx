@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys, fetchPipeline } from "./api";
+import { formatCurrency, formatPercent } from "./format";
 
 export const Pipeline: React.FC = () => {
     const { data: report, isLoading } = useQuery({
@@ -9,12 +10,6 @@ export const Pipeline: React.FC = () => {
 
     if (isLoading) return <p>Loading pipeline...</p>;
     if (!report) return <p>No pipeline data</p>;
-
-    const formatCurrency = (value: number) =>
-        new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-            value,
-        );
-    const formatPercent = (value: number) => `${(value * 100).toFixed(0)}%`;
 
     return (
         <div className="space-y-6">
