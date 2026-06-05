@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AddLead } from "./add-lead";
 import { Leads } from "./leads";
 import { Pipeline } from "./pipeline";
 import { ManageFields } from "./manage-fields";
@@ -10,11 +9,6 @@ type Page = "home" | "pipeline" | "settings";
 
 export const App: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<Page>("home");
-    const [fieldsRefresh, setFieldsRefresh] = useState(0);
-
-    const handleFieldsChanged = () => {
-        setFieldsRefresh(prev => prev + 1);
-    };
 
     const navClass = "px-4 py-2 rounded font-medium transition";
     const activeNavClass = "bg-blue-500 text-white";
@@ -25,30 +19,29 @@ export const App: React.FC = () => {
             <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold">SimpleCRM</h1>
                 <div className="flex gap-2">
-                    <button onClick={() => setCurrentPage("home")} className={`${navClass} ${currentPage === "home" ? activeNavClass : inactiveNavClass}`}>
+                    <button
+                        onClick={() => setCurrentPage("home")}
+                        className={`${navClass} ${currentPage === "home" ? activeNavClass : inactiveNavClass}`}>
                         Home
                     </button>
-                    <button onClick={() => setCurrentPage("pipeline")} className={`${navClass} ${currentPage === "pipeline" ? activeNavClass : inactiveNavClass}`}>
+                    <button
+                        onClick={() => setCurrentPage("pipeline")}
+                        className={`${navClass} ${currentPage === "pipeline" ? activeNavClass : inactiveNavClass}`}>
                         Pipeline
                     </button>
-                    <button onClick={() => setCurrentPage("settings")} className={`${navClass} ${currentPage === "settings" ? activeNavClass : inactiveNavClass}`}>
+                    <button
+                        onClick={() => setCurrentPage("settings")}
+                        className={`${navClass} ${currentPage === "settings" ? activeNavClass : inactiveNavClass}`}>
                         Settings
                     </button>
                 </div>
             </div>
 
-            {currentPage === "home" && (
-                <>
-                    <Leads refreshTrigger={fieldsRefresh} />
-                    <AddLead triggerRefresh={fieldsRefresh} />
-                </>
-            )}
-
+            {currentPage === "home" && <Leads />}
             {currentPage === "pipeline" && <Pipeline />}
-
             {currentPage === "settings" && (
                 <>
-                    <ManageFields onFieldsChanged={handleFieldsChanged} />
+                    <ManageFields />
                     <ManageStages />
                     <ManageSettings />
                 </>

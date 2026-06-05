@@ -1,49 +1,53 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { CustomField } from "./types";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    queryKeys,
+    fetchCustomFields,
+    createCustomField,
+    deleteCustomField,
+} from "./api";
 
-export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFieldsChanged }) => {
-    const [fields, setFields] = useState<CustomField[]>([]);
+export const ManageFields: React.FC = () => {
+    const queryClient = useQueryClient();
+    const { data: fields = [] } = useQuery({
+        queryKey: queryKeys.customFields,
+        queryFn: fetchCustomFields,
+    });
+
     const [newFieldName, setNewFieldName] = useState("");
     const [newFieldLabel, setNewFieldLabel] = useState("");
     const [newFieldEntity, setNewFieldEntity] = useState("lead");
     const [newFieldType, setNewFieldType] = useState("text");
 
-    useEffect(() => {
-        fetchFields();
-    }, []);
+    const invalidate = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.customFields });
 
-    const fetchFields = async () => {
-        const result = await axios.get("/api/custom-fields");
-        setFields(result.data);
-    };
-
-    const addField = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newFieldName || !newFieldLabel) return;
-
-        try {
-            await axios.post("/api/custom-fields", {
-                name: newFieldName,
-                label: newFieldLabel,
-                entity: newFieldEntity,
-                type: newFieldType,
-            });
+    const addMutation = useMutation({
+        mutationFn: createCustomField,
+        onSuccess: () => {
             setNewFieldName("");
             setNewFieldLabel("");
             setNewFieldEntity("lead");
             setNewFieldType("text");
-            fetchFields();
-            onFieldsChanged();
-        } catch (error) {
-            alert("Failed to add field. Field name might already exist.");
-        }
-    };
+            invalidate();
+        },
+        onError: () => alert("Failed to add field. Field name might already exist."),
+    });
 
-    const deleteField = async (id: number) => {
-        await axios.delete(`/api/custom-fields/${id}`);
-        fetchFields();
-        onFieldsChanged();
+    const deleteMutation = useMutation({
+        mutationFn: deleteCustomField,
+        onSuccess: invalidate,
+    });
+
+    const addField = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newFieldName || !newFieldLabel) return;
+        addMutation.mutate({
+            name: newFieldName,
+            label: newFieldLabel,
+            entity: newFieldEntity,
+            type: newFieldType,
+        });
     };
 
     return (
@@ -56,16 +60,22 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
                 ) : (
                     <ul className="space-y-2">
                         {fields.map(field => (
-                            <li key={field.id} className="flex justify-between items-center p-2 bg-gray-100 rounded">
+                            <li
+                                key={field.id}
+                                className="flex justify-between items-center p-2 bg-gray-100 rounded">
                                 <div>
                                     <span className="font-medium">{field.label}</span>
-                                    <span className="text-gray-500 text-sm ml-2">({field.name})</span>
-                                    <span className="text-gray-400 text-xs ml-2">[{field.entity || "lead"} · {field.type || "text"}]</span>
+                                    <span className="text-gray-500 text-sm ml-2">
+                                        ({field.name})
+                                    </span>
+                                    <span className="text-gray-400 text-xs ml-2">
+                                        [{field.entity || "lead"} ·{" "}
+                                        {field.type || "text"}]
+                                    </span>
                                 </div>
                                 <button
-                                    onClick={() => deleteField(field.id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                >
+                                    onClick={() => deleteMutation.mutate(field.id)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                                     Delete
                                 </button>
                             </li>
@@ -77,7 +87,9 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
             <form onSubmit={addField} className="space-y-3">
                 <h3 className="font-bold">Add New Field</h3>
                 <div>
-                    <label className="block text-sm font-medium mb-1">Field Name (e.g., company)</label>
+                    <label className="block text-sm font-medium mb-1">
+                        Field Name (e.g., company)
+                    </label>
                     <input
                         type="text"
                         value={newFieldName}
@@ -87,7 +99,9 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">Field Label (e.g., Company)</label>
+                    <label className="block text-sm font-medium mb-1">
+                        Field Label (e.g., Company)
+                    </label>
                     <input
                         type="text"
                         value={newFieldLabel}
@@ -98,12 +112,13 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
                 </div>
                 <div className="flex gap-2">
                     <div className="flex-1">
-                        <label className="block text-sm font-medium mb-1">Applies to</label>
+                        <label className="block text-sm font-medium mb-1">
+                            Applies to
+                        </label>
                         <select
                             value={newFieldEntity}
                             onChange={e => setNewFieldEntity(e.target.value)}
-                            className="border rounded px-2 py-1 w-full"
-                        >
+                            className="border rounded px-2 py-1 w-full">
                             <option value="lead">Lead</option>
                             <option value="opportunity">Opportunity</option>
                         </select>
@@ -113,8 +128,7 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
                         <select
                             value={newFieldType}
                             onChange={e => setNewFieldType(e.target.value)}
-                            className="border rounded px-2 py-1 w-full"
-                        >
+                            className="border rounded px-2 py-1 w-full">
                             <option value="text">Text</option>
                             <option value="number">Number</option>
                         </select>
@@ -122,8 +136,7 @@ export const ManageFields: React.FC<{ onFieldsChanged: () => void }> = ({ onFiel
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Add Field
                 </button>
             </form>

@@ -1,43 +1,72 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    queryKeys,
+    fetchStages,
+    createStage,
+    updateStage,
+    deleteStage as deleteStageApi,
+} from "./api";
 import { Stage } from "./types";
 
 export const ManageStages: React.FC = () => {
-    const [stages, setStages] = useState<Stage[]>([]);
+    const queryClient = useQueryClient();
+    const { data: stages = [] } = useQuery({
+        queryKey: queryKeys.stages,
+        queryFn: fetchStages,
+    });
+
     const [newName, setNewName] = useState("");
-    const [newStatus, setNewStatus] = useState<"pending" | "won" | "lost">("pending");
+    const [newStatus, setNewStatus] = useState<"pending" | "won" | "lost">(
+        "pending",
+    );
     const [newLikelihood, setNewLikelihood] = useState("0.5");
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
-    const [editStatus, setEditStatus] = useState<"pending" | "won" | "lost">("pending");
+    const [editStatus, setEditStatus] = useState<"pending" | "won" | "lost">(
+        "pending",
+    );
     const [editLikelihood, setEditLikelihood] = useState("0.5");
 
-    useEffect(() => {
-        fetchStages();
-    }, []);
-
-    const fetchStages = async () => {
-        const result = await axios.get("/api/stages");
-        setStages(result.data);
+    const invalidate = () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.stages });
+        queryClient.invalidateQueries({ queryKey: queryKeys.pipeline });
     };
 
-    const addStage = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newName) return;
-
-        try {
-            await axios.post("/api/stages", {
-                name: newName,
-                status: newStatus,
-                conversionLikelihood: parseFloat(newLikelihood),
-            });
+    const addMutation = useMutation({
+        mutationFn: createStage,
+        onSuccess: () => {
             setNewName("");
             setNewStatus("pending");
             setNewLikelihood("0.5");
-            fetchStages();
-        } catch (error) {
-            alert("Failed to add stage");
-        }
+            invalidate();
+        },
+        onError: () => alert("Failed to add stage"),
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: ({ id, input }: { id: number; input: Parameters<typeof updateStage>[1] }) =>
+            updateStage(id, input),
+        onSuccess: () => {
+            setEditingId(null);
+            invalidate();
+        },
+        onError: () => alert("Failed to update stage"),
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteStageApi,
+        onSuccess: invalidate,
+    });
+
+    const addStage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newName) return;
+        addMutation.mutate({
+            name: newName,
+            status: newStatus,
+            conversionLikelihood: parseFloat(newLikelihood),
+        });
     };
 
     const startEdit = (stage: Stage) => {
@@ -47,26 +76,20 @@ export const ManageStages: React.FC = () => {
         setEditLikelihood(stage.conversionLikelihood.toString());
     };
 
-    const saveEdit = async () => {
+    const saveEdit = () => {
         if (!editingId) return;
-        try {
-            await axios.put(`/api/stages/${editingId}`, {
+        updateMutation.mutate({
+            id: editingId,
+            input: {
                 name: editName,
                 status: editStatus,
                 conversionLikelihood: parseFloat(editLikelihood),
-            });
-            setEditingId(null);
-            fetchStages();
-        } catch (error) {
-            alert("Failed to update stage");
-        }
+            },
+        });
     };
 
-    const deleteStage = async (id: number) => {
-        if (confirm("Delete this stage?")) {
-            await axios.delete(`/api/stages/${id}`);
-            fetchStages();
-        }
+    const onDelete = (id: number) => {
+        if (confirm("Delete this stage?")) deleteMutation.mutate(id);
     };
 
     return (
@@ -88,7 +111,17 @@ export const ManageStages: React.FC = () => {
                                             onChange={e => setEditName(e.target.value)}
                                             className="block w-full p-2 border rounded"
                                         />
-                                        <select value={editStatus} onChange={e => setEditStatus(e.target.value as any)} className="block w-full p-2 border rounded">
+                                        <select
+                                            value={editStatus}
+                                            onChange={e =>
+                                                setEditStatus(
+                                                    e.target.value as
+                                                        | "pending"
+                                                        | "won"
+                                                        | "lost",
+                                                )
+                                            }
+                                            className="block w-full p-2 border rounded">
                                             <option>pending</option>
                                             <option>won</option>
                                             <option>lost</option>
@@ -99,14 +132,20 @@ export const ManageStages: React.FC = () => {
                                             max="1"
                                             step="0.05"
                                             value={editLikelihood}
-                                            onChange={e => setEditLikelihood(e.target.value)}
+                                            onChange={e =>
+                                                setEditLikelihood(e.target.value)
+                                            }
                                             className="block w-full p-2 border rounded"
                                         />
                                         <div className="flex gap-2">
-                                            <button onClick={saveEdit} className="bg-green-500 text-white px-3 py-1 rounded">
+                                            <button
+                                                onClick={saveEdit}
+                                                className="bg-green-500 text-white px-3 py-1 rounded">
                                                 Save
                                             </button>
-                                            <button onClick={() => setEditingId(null)} className="bg-gray-500 text-white px-3 py-1 rounded">
+                                            <button
+                                                onClick={() => setEditingId(null)}
+                                                className="bg-gray-500 text-white px-3 py-1 rounded">
                                                 Cancel
                                             </button>
                                         </div>
@@ -114,15 +153,28 @@ export const ManageStages: React.FC = () => {
                                 ) : (
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <span className="font-medium">{stage.name}</span>
-                                            <span className="text-xs text-gray-600 ml-2">({stage.status})</span>
-                                            <span className="text-xs text-gray-600 ml-2">{(stage.conversionLikelihood * 100).toFixed(0)}%</span>
+                                            <span className="font-medium">
+                                                {stage.name}
+                                            </span>
+                                            <span className="text-xs text-gray-600 ml-2">
+                                                ({stage.status})
+                                            </span>
+                                            <span className="text-xs text-gray-600 ml-2">
+                                                {(
+                                                    stage.conversionLikelihood * 100
+                                                ).toFixed(0)}
+                                                %
+                                            </span>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button onClick={() => startEdit(stage)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                                            <button
+                                                onClick={() => startEdit(stage)}
+                                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
                                                 Edit
                                             </button>
-                                            <button onClick={() => deleteStage(stage.id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
+                                            <button
+                                                onClick={() => onDelete(stage.id)}
+                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
                                                 Delete
                                             </button>
                                         </div>
@@ -143,13 +195,21 @@ export const ManageStages: React.FC = () => {
                     placeholder="Stage name"
                     className="block w-full p-2 border rounded"
                 />
-                <select value={newStatus} onChange={e => setNewStatus(e.target.value as any)} className="block w-full p-2 border rounded">
+                <select
+                    value={newStatus}
+                    onChange={e =>
+                        setNewStatus(e.target.value as "pending" | "won" | "lost")
+                    }
+                    className="block w-full p-2 border rounded">
                     <option value="pending">Pending</option>
                     <option value="won">Won</option>
                     <option value="lost">Lost</option>
                 </select>
                 <div>
-                    <label className="text-sm block mb-1">Conversion Likelihood: {(parseFloat(newLikelihood) * 100).toFixed(0)}%</label>
+                    <label className="text-sm block mb-1">
+                        Conversion Likelihood:{" "}
+                        {(parseFloat(newLikelihood) * 100).toFixed(0)}%
+                    </label>
                     <input
                         type="range"
                         min="0"
@@ -160,7 +220,9 @@ export const ManageStages: React.FC = () => {
                         className="w-full"
                     />
                 </div>
-                <button type="submit" className="block w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <button
+                    type="submit"
+                    className="block w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                     Add Stage
                 </button>
             </form>
