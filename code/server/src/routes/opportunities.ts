@@ -34,6 +34,7 @@ opportunitiesRouter.post("/opportunities", async (req, res) => {
         .findOne({ where: { id: req.body.stageId } });
     opp.value = req.body.value;
     opp.name = req.body.name;
+    opp.closeDate = req.body.closeDate || null;
     opp.customFields = req.body.customFields || {};
     opp.expectedValue = expectedValueFor(opp.value, opp.stage, settings);
     await AppDataSource.manager.getRepository(Opportunity).save(opp);
@@ -61,6 +62,7 @@ opportunitiesRouter.put("/opportunities/:id", async (req, res) => {
         opp.value = req.body.value;
     }
     if (req.body.name !== undefined) opp.name = req.body.name;
+    if (req.body.closeDate !== undefined) opp.closeDate = req.body.closeDate || null;
     if (req.body.customFields) opp.customFields = req.body.customFields;
     opp.expectedValue = expectedValueFor(opp.value, opp.stage, settings);
     await repo.save(opp);

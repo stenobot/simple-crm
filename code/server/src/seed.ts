@@ -80,6 +80,30 @@ export async function seedDatabase({ clearFirst = false }: { clearFirst?: boolea
     console.log(`✓ Created ${leads.length} leads`);
 
     let oppCount = 0;
+    const today = new Date();
+    const toIso = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const pickCloseDate = (): string | null => {
+        const r = Math.random();
+        if (r < 0.2) return null;
+        if (r < 0.35) {
+            // past 1-90 days
+            const d = new Date(today);
+            d.setDate(d.getDate() - (Math.floor(Math.random() * 90) + 1));
+            return toIso(d);
+        }
+        if (r < 0.85) {
+            // next 0-180 days (spread across the 6-month window)
+            const d = new Date(today);
+            d.setDate(d.getDate() + Math.floor(Math.random() * 181));
+            return toIso(d);
+        }
+        // far future: 200-720 days out
+        const d = new Date(today);
+        d.setDate(d.getDate() + 200 + Math.floor(Math.random() * 520));
+        return toIso(d);
+    };
+
     for (const lead of leads) {
         const numOpps = Math.floor(Math.random() * 3) + 1;
         for (let i = 0; i < numOpps; i++) {
@@ -88,6 +112,7 @@ export async function seedDatabase({ clearFirst = false }: { clearFirst?: boolea
             opp.stage = stages[Math.floor(Math.random() * stages.length)];
             opp.value = Math.floor(Math.random() * 95000) + 5000;
             opp.name = dealNames[Math.floor(Math.random() * dealNames.length)];
+            opp.closeDate = pickCloseDate();
             const region = regionValues[Math.floor(Math.random() * regionValues.length)];
             const rawHeadcount = Math.floor(Math.random() * 500) + 10;
             opp.customFields = {
