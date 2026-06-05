@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { Leads } from "./leads";
 import { Pipeline } from "./pipeline";
+import { Forecast } from "./forecast";
 import { Settings } from "./settings";
 
 const navClass = "px-4 py-2 rounded font-medium transition";
@@ -21,6 +22,9 @@ export const App: React.FC = () => (
                 <NavLink to="/pipeline" className={navLinkClass}>
                     Pipeline
                 </NavLink>
+                <NavLink to="/forecast" className={navLinkClass}>
+                    Forecast
+                </NavLink>
                 <NavLink to="/settings" className={navLinkClass}>
                     Settings
                 </NavLink>
@@ -30,6 +34,7 @@ export const App: React.FC = () => (
         <Routes>
             <Route path="/" element={<Leads />} />
             <Route path="/pipeline" element={<Pipeline />} />
+            <Route path="/forecast" element={<Forecast />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
