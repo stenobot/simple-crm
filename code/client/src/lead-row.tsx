@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Lead } from "./types";
 import { LeadOpportunities } from "./lead-opportunities";
+import { IconButton, PencilIcon } from "./icons";
 
 export const LeadRow: React.FC<{
     lead: Lead;
@@ -30,18 +31,28 @@ export const LeadRow: React.FC<{
                 </td>
                 <td className="border border-gray-300 p-2">{lead.firstName}</td>
                 <td className="border border-gray-300 p-2">{lead.lastName}</td>
-                <td className="border border-gray-300 p-2 text-right font-mono">{lead.age}</td>
+                <td className="border border-gray-300 p-2 text-right font-mono">
+                    {lead.age}
+                </td>
                 <td className="border border-gray-300 p-2">{lead.phoneNumber}</td>
+                <td className="w-10 pl-2 bg-white text-center">
+                    <IconButton
+                        onClick={e => {
+                            e.stopPropagation();
+                            onEdit(lead);
+                        }}
+                        label="Edit lead">
+                        <PencilIcon />
+                    </IconButton>
+                </td>
             </tr>
             {expanded && (
                 <tr>
                     <td className="bg-white"></td>
                     <td colSpan={4} className="border border-gray-300 p-4 bg-gray-50">
-                        <LeadOpportunities
-                            lead={lead}
-                            onEditLead={() => onEdit(lead)}
-                        />
+                        <LeadOpportunities lead={lead} />
                     </td>
+                    <td className="bg-white"></td>
                 </tr>
             )}
         </>

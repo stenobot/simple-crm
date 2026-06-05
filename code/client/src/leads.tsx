@@ -43,6 +43,7 @@ export const Leads: React.FC = () => {
                         <th className="border border-gray-300 bg-gray-100 p-2 text-left">Last Name</th>
                         <th className="border border-gray-300 bg-gray-100 p-2 text-right">Age</th>
                         <th className="border border-gray-300 bg-gray-100 p-2 text-left">Phone Number</th>
+                        <th className="w-10"></th>
                     </tr>
                 </thead>
                 <tbody>

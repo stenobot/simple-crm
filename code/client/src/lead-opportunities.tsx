@@ -13,8 +13,7 @@ import { IconButton, PencilIcon, TrashIcon } from "./icons";
 
 export const LeadOpportunities: React.FC<{
     lead: Lead;
-    onEditLead?: () => void;
-}> = ({ lead, onEditLead }) => {
+}> = ({ lead }) => {
     const queryClient = useQueryClient();
     const { data: allOpps = [] } = useQuery({
         queryKey: queryKeys.opportunities,
@@ -48,18 +47,11 @@ export const LeadOpportunities: React.FC<{
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="font-bold">Opportunities</h3>
-                <div className="flex gap-1 items-center">
-                    {onEditLead && (
-                        <IconButton onClick={onEditLead} label="Edit lead">
-                            <PencilIcon />
-                        </IconButton>
-                    )}
-                    <button
-                        onClick={openAdd}
-                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
-                        Add Opportunity
-                    </button>
-                </div>
+                <button
+                    onClick={openAdd}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
+                    Add Opportunity
+                </button>
             </div>
             {opportunities.length === 0 ? (
                 <p className="text-gray-500">No opportunities</p>
