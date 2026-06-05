@@ -26,7 +26,7 @@ const monthLabel = (date: Date): string =>
 const monthKey = (year: number, month: number): string =>
     `${year}-${String(month + 1).padStart(2, "0")}`;
 
-const hasNonEmptyValue = (
+export const hasNonEmptyCustomField = (
     opp: Opportunity,
     fieldName: string | null | undefined,
 ): boolean => {
@@ -74,7 +74,7 @@ export const buildForecast = (
 
     for (const opp of opportunities) {
         if (!opp.closeDate) continue;
-        if (!hasNonEmptyValue(opp, opts.customFieldName ?? null)) continue;
+        if (!hasNonEmptyCustomField(opp, opts.customFieldName ?? null)) continue;
         const d = parseLocalDate(opp.closeDate);
         if (!d) continue;
         const k = monthKey(d.getFullYear(), d.getMonth());
