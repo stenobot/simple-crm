@@ -9,6 +9,7 @@ import { Lead, Opportunity } from "./types";
 import { formatCurrency } from "./format";
 import { Drawer } from "./drawer";
 import { OpportunityForm } from "./opportunity-form";
+import { IconButton, PencilIcon, TrashIcon } from "./icons";
 
 export const LeadOpportunities: React.FC<{
     lead: Lead;
@@ -47,13 +48,11 @@ export const LeadOpportunities: React.FC<{
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="font-bold">Opportunities</h3>
-                <div className="flex gap-2">
+                <div className="flex gap-1 items-center">
                     {onEditLead && (
-                        <button
-                            onClick={onEditLead}
-                            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm">
-                            Edit Lead
-                        </button>
+                        <IconButton onClick={onEditLead} label="Edit lead">
+                            <PencilIcon />
+                        </IconButton>
                     )}
                     <button
                         onClick={openAdd}
@@ -92,17 +91,18 @@ export const LeadOpportunities: React.FC<{
                                     </span>
                                 )}
                             </div>
-                            <div className="flex gap-2">
-                                <button
+                            <div className="flex gap-1">
+                                <IconButton
                                     onClick={() => openEdit(opp)}
-                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
-                                    Edit
-                                </button>
-                                <button
+                                    label="Edit opportunity">
+                                    <PencilIcon />
+                                </IconButton>
+                                <IconButton
                                     onClick={() => deleteMutation.mutate(opp.id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
-                                    Delete
-                                </button>
+                                    label="Delete opportunity"
+                                    variant="danger">
+                                    <TrashIcon />
+                                </IconButton>
                             </div>
                         </div>
                     ))}

@@ -8,6 +8,7 @@ import {
     deleteStage as deleteStageApi,
 } from "./api";
 import { Stage } from "./types";
+import { IconButton, PencilIcon, TrashIcon } from "./icons";
 
 export const ManageStages: React.FC = () => {
     const queryClient = useQueryClient();
@@ -166,17 +167,18 @@ export const ManageStages: React.FC = () => {
                                                 %
                                             </span>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button
+                                        <div className="flex gap-1">
+                                            <IconButton
                                                 onClick={() => startEdit(stage)}
-                                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">
-                                                Edit
-                                            </button>
-                                            <button
+                                                label="Edit stage">
+                                                <PencilIcon />
+                                            </IconButton>
+                                            <IconButton
                                                 onClick={() => onDelete(stage.id)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
-                                                Delete
-                                            </button>
+                                                label="Delete stage"
+                                                variant="danger">
+                                                <TrashIcon />
+                                            </IconButton>
                                         </div>
                                     </div>
                                 )}

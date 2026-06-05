@@ -11,6 +11,7 @@ import { buildForecast, hasNonEmptyCustomField } from "./forecast-buckets";
 import { Drawer } from "./drawer";
 import { OpportunityForm } from "./opportunity-form";
 import { Opportunity } from "./types";
+import { IconButton, PencilIcon, TrashIcon } from "./icons";
 
 const ALL = "__all__";
 
@@ -159,21 +160,22 @@ export const Forecast: React.FC = () => {
                                             )}
                                         </td>
                                         <td className="border p-2">
-                                            <div className="flex gap-2 justify-end">
-                                                <button
+                                            <div className="flex gap-1 justify-end">
+                                                <IconButton
                                                     onClick={() => openEdit(opp)}
-                                                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">
-                                                    Edit
-                                                </button>
-                                                <button
+                                                    label="Edit opportunity">
+                                                    <PencilIcon />
+                                                </IconButton>
+                                                <IconButton
                                                     onClick={() =>
                                                         deleteMutation.mutate(
                                                             opp.id,
                                                         )
                                                     }
-                                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">
-                                                    Delete
-                                                </button>
+                                                    label="Delete opportunity"
+                                                    variant="danger">
+                                                    <TrashIcon />
+                                                </IconButton>
                                             </div>
                                         </td>
                                     </tr>

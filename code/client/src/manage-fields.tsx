@@ -6,6 +6,7 @@ import {
     createCustomField,
     deleteCustomField,
 } from "./api";
+import { IconButton, TrashIcon } from "./icons";
 
 export const ManageFields: React.FC = () => {
     const queryClient = useQueryClient();
@@ -73,11 +74,12 @@ export const ManageFields: React.FC = () => {
                                         {field.type || "text"}]
                                     </span>
                                 </div>
-                                <button
+                                <IconButton
                                     onClick={() => deleteMutation.mutate(field.id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                    Delete
-                                </button>
+                                    label="Delete custom field"
+                                    variant="danger">
+                                    <TrashIcon />
+                                </IconButton>
                             </li>
                         ))}
                     </ul>
