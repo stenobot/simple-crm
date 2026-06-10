@@ -44,10 +44,12 @@ in the root `package.json`. Always run commands from the repo root unless noted.
 | `npm run build` | `npm run build` in each workspace (`tsc -b && vite build` / `tsc -p .`) |
 | `npm run typecheck` | Type-checks both workspaces |
 | `npm run lint` | Lints client only (server has no lint script) |
-| `npm run test` | No tests exist; the script is a no-op via `--if-present` |
+| `npm run test` | Runs Vitest (`vitest run`) in each workspace that has a `test` script — currently both client and server |
 
 Workspace-scoped runs: `npm run <script> -w @simple-crm/server` (or `-w @simple-crm/client`).
-There is no single-test runner because there is no test suite.
+Both workspaces use **Vitest**; run one workspace's suite with
+`npm run test -w @simple-crm/server`, or a single file with `npx vitest run <path>` from
+inside that workspace. Tests cover pure logic only (no route/integration tests).
 
 Reset/reseed the database: `npm run seed -w @simple-crm/server`. This wipes and reseeds
 `code/server/database.sqlite`. On a normal `dev` start, `seedDatabase()` runs but
@@ -69,21 +71,25 @@ Reset/reseed the database: `npm run seed -w @simple-crm/server`. This wipes and 
 - **Custom fields** are stored as `simple-json` columns (`Lead.customFields`,
   `Opportunity.customFields`) — arbitrary key/value bags driven by rows in the
   `CustomField` table (which has an `entity` discriminator: `"lead"` or `"opportunity"`).
-- **Expected value bookkeeping**: `Opportunity.expectedValue = value * likelihood`,
-  where likelihood is `wonStageLikelihood` / `lostStageLikelihood` / the stage's own
-  `conversionLikelihood` depending on `stage.status` (`"won" | "lost" | "pending"`).
-  `Stage.expectedValue` is a **denormalized rolling sum** maintained by the POST/PUT/
-  DELETE `/opportunities` handlers and by PUT `/settings/:key` when the won/lost
-  likelihood settings change. Any new code that creates, moves, deletes, or revalues
-  opportunities must keep this sum in sync — the `/pipeline` report and UI rely on it.
+- **Expected value**: `Opportunity.expectedValue = value * likelihood`, where likelihood
+  is `wonStageLikelihood` / `lostStageLikelihood` / the stage's own `conversionLikelihood`
+  depending on `stage.status` (`"won" | "lost" | "pending"`). The calculation lives in
+  `code/server/src/services/opportunity-value.ts` (`expectedValueFor`/`likelihoodFor`) and
+  is recomputed by the POST and PUT `/opportunities` handlers whenever an opportunity is
+  created or revalued. There is **no** denormalized per-stage total: `GET /pipeline`
+  recomputes the per-stage and overall `totalValue`/`expectedValue` sums on every request
+  directly from the opportunities (`code/server/src/routes/pipeline.ts`).
 - **App settings** (`AppSetting`) are a key/value table seeded with
   `wonStageLikelihood`, `lostStageLikelihood`, `minimumOpportunityValue`,
   `defaultStageConversionLikelihood`. Read via `GET /settings`, upserted via
   `PUT /settings/:key` with `{ value }`.
-- **Client structure**: `code/client/src/App.tsx` is a simple page switcher
-  (`home | pipeline | settings`) — no router. Each top-level feature is a single
-  `.tsx` file (`leads.tsx`, `pipeline.tsx`, `manage-fields.tsx`, etc.). Shared API
-  types live in `code/client/src/types.ts` and are hand-mirrored from server entities.
+- **Client structure**: `code/client/src/App.tsx` uses **React Router**
+  (`react-router-dom`) with routes for `/` (Leads), `/pipeline`, `/forecast`, and
+  `/settings`, plus a catch-all that redirects to `/`. Each top-level feature is a single
+  `.tsx` file (`leads.tsx`, `pipeline.tsx`, `forecast.tsx`, `manage-fields.tsx`, etc.).
+  Server calls are centralized in `code/client/src/api.ts` (axios + TanStack Query keys);
+  shared API types live in `code/client/src/types.ts` and are hand-mirrored from server
+  entities.
 
 ## Conventions
 
@@ -97,7 +103,10 @@ Reset/reseed the database: `npm run seed -w @simple-crm/server`. This wipes and 
 - **Error handling on the server is intentionally minimal** — most handlers assume the
   record exists and write directly. Match the existing style for small changes; only
   add validation when it's genuinely needed for the feature you're building.
-- **No auth, no tests, no migrations.** Don't invent these unless explicitly asked.
+- **No auth and no migrations.** Don't invent these unless explicitly asked. There **are**
+  Vitest unit tests for pure logic (e.g. `opportunity-value.test.ts`,
+  `forecast-buckets.test.ts`, `format.test.ts`), but no route/integration tests — don't
+  assume broader test coverage exists.
 
 ## Browser automation (Playwright MCP)
 

@@ -41,3 +41,13 @@ code/
   client/   React + Vite frontend
   server/   Express + TypeORM API
 ```
+
+## Documentation
+
+Detailed docs live in [`docs/`](./docs/README.md). The backend is documented in depth:
+
+- [Backend overview](./docs/backend/README.md)
+- [Data model](./docs/backend/data-model.md)
+- [API reference](./docs/backend/api-reference.md)
+- [Business logic](./docs/backend/business-logic.md)
+- [Database & seeding](./docs/backend/database-and-seeding.md)
