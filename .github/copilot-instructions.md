@@ -17,6 +17,10 @@ solution? (b) what approach would a senior engineer with deep familiarity with t
 codebase take? If the answers are not obvious, search first, then run your preferred 
 approach by me.
 
+**Always get approval before committing.** Do not run `git commit` (or otherwise
+commit code changes) until I have reviewed the changes and explicitly approved them.
+Stage and describe the work, but wait for my go-ahead to commit.
+
 ## Taxonomy
 - **Lead**: A potential customer tracked by sales reps. Includes customer's personal info and opportunities.
 - **Opportunity**: A deal that sales reps are working on for a lead. A lead can have none or many opportunities.

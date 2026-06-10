@@ -1,6 +1,7 @@
 import * as express from "express";
 import { AppDataSource } from "../data-source";
 import { Lead } from "../entity/Lead";
+import { Opportunity } from "../entity/Opportunity";
 
 export const leadsRouter = express.Router();
 
@@ -30,4 +31,17 @@ leadsRouter.put("/leads/:id", async (req, res) => {
     lead.customFields = req.body.customFields || {};
     await repo.save(lead);
     res.json(lead);
+});
+
+leadsRouter.delete("/leads/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    // Remove the lead's opportunities first so none are left orphaned.
+    await AppDataSource.manager
+        .getRepository(Opportunity)
+        .createQueryBuilder()
+        .delete()
+        .where("leadId = :id", { id })
+        .execute();
+    await AppDataSource.manager.getRepository(Lead).delete(id);
+    res.json({ success: true });
 });
