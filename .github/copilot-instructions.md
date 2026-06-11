@@ -111,12 +111,3 @@ Reset/reseed the database: `npm run seed -w @simple-crm/server`. This wipes and 
   Vitest unit tests for pure logic (e.g. `opportunity-value.test.ts`,
   `forecast-buckets.test.ts`, `format.test.ts`), but no route/integration tests — don't
   assume broader test coverage exists.
-
-## Browser automation (Playwright MCP)
-
-The Playwright MCP server is available for end-to-end interaction with the running
-app. When verifying a UI change or reproducing a bug, prefer driving the real app
-over reasoning about it: start `npm run dev`, then use Playwright MCP tools to
-navigate to http://localhost:5173, exercise the flow, and snapshot/inspect the DOM.
-The Vite dev server proxies `/api/*` to the server on :3000, so a single browser
-session covers both tiers.
