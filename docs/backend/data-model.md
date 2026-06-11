@@ -84,6 +84,55 @@ specific keys used.
 Lead 1 ───< many Opportunity many >─── 1 Stage
 ```
 
+The same relationships and standalone metadata/config tables are shown below as a Mermaid ER diagram:
+
+```mermaid
+erDiagram
+    LEAD {
+        int id
+        string firstName
+        string lastName
+        int age
+        string phoneNumber
+        json customFields
+    }
+
+    STAGE {
+        int id
+        string name
+        string status
+        float conversionLikelihood
+        int order
+    }
+
+    OPPORTUNITY {
+        int id
+        float value
+        float expectedValue
+        string name
+        date closeDate
+        json customFields
+    }
+
+    CUSTOM_FIELD {
+        int id
+        string name
+        string label
+        string entity
+        string type
+    }
+
+    APP_SETTING {
+        string key
+        string value
+    }
+
+    LEAD ||--o{ OPPORTUNITY : has
+    STAGE ||--o{ OPPORTUNITY : contains
+```
+
+`CustomField` and `AppSetting` are standalone metadata/config tables (not foreign-keyed), while `Opportunity → Lead` and `Opportunity → Stage` are eager relations.
+
 - A **Lead** has many **Opportunities**; each Opportunity belongs to one Lead.
 - A **Stage** has many **Opportunities**; each Opportunity is in one Stage.
 

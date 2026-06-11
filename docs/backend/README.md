@@ -4,28 +4,24 @@ The SimpleCRM backend is a small **REST API**: the client sends HTTP requests (l
 "give me all leads") and the server answers with JSON. It's written in **TypeScript** and
 runs as a single Node.js process listening on **port 3000**.
 
-This page is the friendly introduction. For specifics, jump to the
+This page is an introduction. For specifics, see 
 [data model](./data-model.md), [API reference](./api-reference.md),
-[business logic](./business-logic.md), or [database & seeding](./database-and-seeding.md).
+[business logic](./business-logic.md), and [database & seeding](./database-and-seeding.md).
 
-## The three technology layers
+## Technology layers
 
-The backend is built from three layers, each with a clear job:
+The backend consists of three layers:
 
 - **Express 5** — the web server framework. It receives incoming HTTP requests, matches
   each one to a handler based on its URL and method, and sends back a JSON response.
 - **TypeORM 0.3** — an **ORM** ("Object-Relational Mapper"). This is a translation layer
   between code and the database. Instead of writing raw SQL, the code works with ordinary
   TypeScript classes (`Lead`, `Opportunity`, etc.), and TypeORM turns operations on those
-  objects into the right database reads and writes. For example, "save this `Lead`
-  object" becomes the appropriate `INSERT` or `UPDATE` behind the scenes.
+  objects into the right database reads and writes, treating database rows as TypeScript objects. 
+  For example, "save this `Lead` object" becomes the appropriate `INSERT` or `UPDATE` behind the scenes.
 - **SQLite** — the actual database. It's a lightweight database that lives in a **single
   file on disk** (`code/server/database.sqlite`) rather than running as a separate server
   process. There's nothing to install or host — the file _is_ the database.
-
-> New to ORMs and SQLite? The mental model: TypeORM lets you treat database rows as
-> TypeScript objects, and SQLite stores those rows in one local file. Together they remove
-> almost all database boilerplate for a small app.
 
 ## How a request flows
 

@@ -5,8 +5,7 @@ pieces fit together.
 
 ## Backend
 
-The server-side API — Express + TypeORM + SQLite. Start with the overview and dig into
-the reference pages as needed.
+The server-side API — Express + TypeORM + SQLite.
 
 - [Backend overview](./backend/README.md) — the big picture, a primer on the tech, how
   a request flows through the system, and startup.
@@ -19,7 +18,21 @@ the reference pages as needed.
 
 ## Frontend
 
-_Coming soon._ Documentation for the React + Vite client will live under `docs/frontend/`.
+The React client — React 19 + Vite 6 + Tailwind v4, using React Router and TanStack
+Query.
+
+- [Frontend overview](./frontend/README.md) — the stack, how the app boots, the nav
+  shell, dev proxy, and request flow at a glance.
+- [Pages & routing](./frontend/pages-and-routing.md) — the routes and what each top-level
+  page does.
+- [Components](./frontend/components.md) — inventory of pages, feature components, and
+  shared UI primitives.
+- [Data layer](./frontend/data-layer.md) — the axios API module, TanStack Query patterns,
+  cache invalidation, and a request sequence diagram.
+- [Forecast & formatting](./frontend/forecast-and-formatting.md) — the tested
+  forecast-bucketing and formatting helpers.
+- [Custom fields](./frontend/custom-fields.md) — how custom fields are defined and edited
+  on the client.
 
 ## See also
 

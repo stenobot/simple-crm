@@ -31,6 +31,19 @@ The likelihood is chosen based on the opportunity's current **stage status**
 | `lost` | the `lostStageLikelihood` setting (default `0.0`) |
 | `pending` | that stage's own `conversionLikelihood` |
 
+The decision flow is:
+
+```mermaid
+flowchart TD
+    A["Opportunity (value) in a Stage"] --> B{stage.status?}
+    B -->|won| C["likelihood = settings.wonStageLikelihood (default 1.0)"]
+    B -->|lost| D["likelihood = settings.lostStageLikelihood (default 0.0)"]
+    B -->|pending else| E["likelihood = stage.conversionLikelihood"]
+    C --> F["expectedValue = value × likelihood"]
+    D --> F
+    E --> F
+```
+
 So a $25,000 opportunity in a `pending` stage with a `conversionLikelihood` of `0.7` has
 an expected value of `25000 × 0.7 = 17,500`. The same opportunity moved into a `won` stage
 would be `25000 × 1.0 = 25,000`.
