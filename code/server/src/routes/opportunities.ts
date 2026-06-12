@@ -42,6 +42,17 @@ opportunitiesRouter.post("/opportunities", async (req, res) => {
     res.json(opp);
 });
 
+opportunitiesRouter.put("/opportunities/reorder", async (req, res) => {
+    const repo = AppDataSource.manager.getRepository(Opportunity);
+    const orderedIds: number[] = req.body.orderedIds;
+
+    for (let i = 0; i < orderedIds.length; i++) {
+        await repo.update(orderedIds[i], { sortOrder: i });
+    }
+
+    res.json({ success: true });
+});
+
 opportunitiesRouter.put("/opportunities/:id", async (req, res) => {
     const settings = await getSettings();
     const repo = AppDataSource.manager.getRepository(Opportunity);

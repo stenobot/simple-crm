@@ -29,6 +29,7 @@ export interface Opportunity {
     stage: Stage;
     value: number;
     expectedValue?: number;
+    sortOrder?: number | null;
     name?: string;
     closeDate?: string | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,5 +49,6 @@ export interface PipelineReport {
         count: number;
         totalValue: number;
         expectedValue: number;
+        opportunities: Opportunity[];
     }[];
 }

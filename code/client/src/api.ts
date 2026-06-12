@@ -65,6 +65,12 @@ export const updateOpportunity = async (
 ): Promise<Opportunity> =>
     (await axios.put(`/api/opportunities/${id}`, input)).data;
 
+export const reorderOpportunities = async (
+    orderedIds: number[],
+): Promise<void> => {
+    await axios.put("/api/opportunities/reorder", { orderedIds });
+};
+
 export const deleteOpportunity = async (id: number): Promise<void> => {
     await axios.delete(`/api/opportunities/${id}`);
 };

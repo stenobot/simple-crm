@@ -25,6 +25,9 @@ export class Opportunity {
     @Column("date", { nullable: true })
     closeDate: string | null;
 
+    @Column("int", { nullable: true })
+    sortOrder: number | null;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     @Column("simple-json", { nullable: true })
     customFields: Record<string, any> = {};
